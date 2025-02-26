@@ -8,7 +8,7 @@ export const FileAnalysis = () => {
     const [repoUrl, setRepoUrl] = useState('');
     const [fileName, setFileName] = useState('');
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     
     const handleAnalyze = async () => {
@@ -38,7 +38,7 @@ export const FileAnalysis = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="p-6 space-y-4 bg-white rounded-lg shadow-lg"
+            className="p-6 space-y-4 bg-gray-800 rounded-lg shadow-lg"
         >
             <motion.div 
                 className="space-y-4"
@@ -50,7 +50,7 @@ export const FileAnalysis = () => {
                     <input 
                         type="text" 
                         placeholder="GitHub Repo URL (e.g., https://github.com/username/repo)"
-                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        className="w-full p-3 pl-10 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all placeholder-gray-400"
                         value={repoUrl} 
                         onChange={(e) => setRepoUrl(e.target.value)}
                     />
@@ -63,7 +63,7 @@ export const FileAnalysis = () => {
                     <input 
                         type="text" 
                         placeholder="File Name (e.g., src/App.js)"
-                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        className="w-full p-3 pl-10 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all placeholder-gray-400"
                         value={fileName} 
                         onChange={(e) => setFileName(e.target.value)}
                     />
@@ -75,7 +75,7 @@ export const FileAnalysis = () => {
                 
                 <motion.button 
                     onClick={handleAnalyze} 
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium p-3 rounded-lg w-full transition-all transform hover:scale-105 active:scale-95 shadow"
+                    className="bg-purple-600 hover:bg-purple-700 text-white font-medium p-3 rounded-lg w-full transition-all transform hover:scale-105 active:scale-95 shadow"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                 >
@@ -89,7 +89,7 @@ export const FileAnalysis = () => {
                 <motion.div 
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="bg-red-50 border-l-4 border-red-500 p-4 rounded"
+                    className="bg-red-900/20 border-l-4 border-red-500 p-4 rounded"
                 >
                     <div className="flex">
                         <div className="flex-shrink-0">
@@ -98,30 +98,30 @@ export const FileAnalysis = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <p className="text-sm text-red-700">{error}</p>
+                            <p className="text-sm text-red-400">{error}</p>
                         </div>
                     </div>
                 </motion.div>
             )}
             
-             {result && (
-                            <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="mt-4"
-                            >
-                                <div className="bg-gray-50 rounded-lg p-4 shadow-inner border border-gray-200">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h3 className="text-lg font-medium text-gray-700">Analysis Result</h3>
-                                    </div>
-                                    <div className="whitespace-pre-wrap break-words text-sm text-gray-800">
-                                        <ReactMarkdown>
-                                            {result}
-                                        </ReactMarkdown>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
+            {result && (
+                <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-4"
+                >
+                    <div className="bg-gray-700 rounded-lg p-4 shadow-inner border border-gray-600">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-lg font-medium text-purple-300">Analysis Result</h3>
+                        </div>
+                        <div className="whitespace-pre-wrap break-words text-sm text-gray-200">
+                            <ReactMarkdown>
+                                {result}
+                            </ReactMarkdown>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
         </motion.div>
     );
 };
