@@ -1,4 +1,4 @@
-import { analyzeRepoContent, scrapeRepository, analyzeFileContent } from '../services/analysisService.js';
+import { analyzeRepoContent, scrapeRepository, analyzeFileContent, generateAlgo } from '../services/analysisService.js';
 import { ApiResponse } from '../utils/responseHandler.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -24,4 +24,14 @@ export const analyzeRepo = asyncHandler(async(req,res)=> {
     const repoAnalysis = await analyzeRepoContent(dir_structure, code_content);
 
     res.status(200).json(new ApiResponse(200, repoAnalysis, `Analysis of ${repo_url}`));
+});
+
+export const generateTypingTest = asyncHandler(async(req,res)=>{
+    const {language} = req.body;
+
+    const typingTest = await generateAlgo(language);
+    // if(!typingTest){
+    //     throw new ApiError();
+    // }
+    res.status(200).json(new ApiResponse(200,typingTest,`Typing Test in ${language}`));
 })

@@ -77,3 +77,37 @@
             throw new Error("Failed to analyze the given Repository");
         }
     }
+
+    export const generateAlgo = async (language) => {
+        const systemPrompt = `You generate only code for a random DSA algorithm in the requested programming language. No explanations, comments, or additional text.`;
+    
+        const userPrompt = `Generate a random DSA algorithm in ${language}. Return only the code.`;
+    
+        const payload = {
+            model: 'meta-llama/llama-3.3-70b-instruct:free',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+            ]
+        };
+    
+        const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+        const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+    
+        if (!OPENROUTER_API_KEY) {
+            throw new Error("Missing OpenRouter API Key.");
+        }
+    
+        const headers = {
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json'
+        };
+    
+        try {
+            const response = await axios.post(OPENROUTER_API_URL, payload, { headers });
+            return response.data;
+        } catch (error) {
+            throw new Error(`Failed to generate algorithm in ${language}: ${error.message}`);
+        }
+    };
+    
