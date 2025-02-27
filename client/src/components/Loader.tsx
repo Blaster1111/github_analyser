@@ -1,6 +1,5 @@
 import { quantum } from 'ldrs'
 
-// Register the loader
 quantum.register()
 
 export const Loader = () => {

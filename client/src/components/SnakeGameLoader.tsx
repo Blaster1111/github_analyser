@@ -152,8 +152,7 @@ export const SnakeGameLoader: React.FC = () => {
         head.x += 1;
         break;
     }
-  
-    // Check if snake is outside the grid (boundary collision)
+    //boundary checker
     if (
       head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT
     ) {
@@ -161,7 +160,7 @@ export const SnakeGameLoader: React.FC = () => {
       return;
     }
   
-    // Check self collision
+    //self touch checker
     const selfCollision = snake.slice(1).some(
       segment => segment.x === head.x && segment.y === head.y
     );
@@ -171,21 +170,14 @@ export const SnakeGameLoader: React.FC = () => {
       return;
     }
   
-    // Create new snake array
+  
     const newSnake = [head, ...snake];
-  
-    // Check food collision
+
     if (head.x === food.x && head.y === food.y) {
-      // Increase score
       setScore(prev => prev + 1);
-  
-      // Speed up slightly (min 70ms)
       setSpeed(prev => Math.max(70, prev - 5));
-  
-      // Generate new food
       setFood(generateFood());
     } else {
-      // Remove tail if no food was eaten
       newSnake.pop();
     }
   
@@ -193,7 +185,6 @@ export const SnakeGameLoader: React.FC = () => {
   };
   
   
-  // Handle touch controls for mobile
   const handleTouchStart = (direction: string) => {
     if (gameOver) {
       resetGame();

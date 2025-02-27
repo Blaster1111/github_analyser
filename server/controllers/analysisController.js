@@ -38,11 +38,7 @@ export const generateTypingTest = asyncHandler(async(req,res)=>{
 
 export const generateRepoReadme = asyncHandler(async (req, res) => {
     const { repo_url } = req.body;
-    
-    // First scrape the repository to get structure and content
     const { dir_structure, code_content } = await scrapeRepository(repo_url);
-    
-    // Generate README using the new function
     const readmeContent = await generateReadme(dir_structure, code_content);
     
     res.status(200).json(new ApiResponse(

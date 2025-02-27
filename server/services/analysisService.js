@@ -135,10 +135,6 @@
     
         return await callOpenRouter(prompt, "You are an expert at creating well-structured, professional README files for software projects.");
     };
-    
-    /**
-     * Helper function to call OpenRouter AI.
-     */
     const callOpenRouter = async (userPrompt, systemPrompt) => {
         const payload = {
             model: "meta-llama/llama-3.3-70b-instruct:free",

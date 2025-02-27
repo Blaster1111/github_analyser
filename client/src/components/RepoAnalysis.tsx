@@ -22,7 +22,6 @@ export const RepoAnalysis = () => {
         
         try {
             const response = await analyzeRepo(repoUrl);
-            // Extract content from the response if it exists
             const content = response?.data?.data?.choices?.[0]?.message?.content;
             setResult(content);
         } catch (err) {
