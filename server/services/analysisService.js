@@ -110,4 +110,56 @@
             throw new Error(`Failed to generate algorithm in ${language}: ${error.message}`);
         }
     };
+
+
+    export const generateReadme = async (dir_structure, code_content) => {
+        const prompt = `
+            Generate a professional and structured **README.md** for the following GitHub repository.
+            \n\n**Directory Structure:**\n\`\`\`${dir_structure}\`\`\`
+            \n\n**Code Content:**\n\`\`\`${code_content}\`\`\`
+    
+            Your README should include:
+            - **Project Title** 🚀  
+            - **Description** 📖 (2-3 sentence summary)
+            - **Features** ✅ (4-6 bullet points)
+            - **Technologies Used** 🛠️ (Frontend, Backend, Database, APIs/Libraries)
+            - **Installation** 💾 (Commands in code blocks)
+            - **Usage Guide** 🔍 (Step-by-step instructions)
+            - **API Documentation** 📡 (Use a table format)
+            - **Project Structure** 📂 (Explain key files)
+            - **Contributing** 🤝 (Contribution guidelines)
+            - **License** 📄 (Specify license type)
+            
+            Ensure proper **Markdown formatting** and a **professional tone**.
+        `;
+    
+        return await callOpenRouter(prompt, "You are an expert at creating well-structured, professional README files for software projects.");
+    };
+    
+    /**
+     * Helper function to call OpenRouter AI.
+     */
+    const callOpenRouter = async (userPrompt, systemPrompt) => {
+        const payload = {
+            model: "meta-llama/llama-3.3-70b-instruct:free",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt }
+            ]
+        };
+    
+        const headers = {
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        };
+    
+        try {
+            const response = await axios.post(OPENROUTER_API_URL, payload, { headers });
+            return response.data;
+        } catch (error) {
+            console.error("🚨 OpenRouter AI Error:", error.response?.data || error.message);
+            throw new Error("Failed to process request with OpenRouter AI.");
+        }
+    };
+
     

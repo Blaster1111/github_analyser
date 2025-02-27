@@ -1,4 +1,4 @@
-import { analyzeRepoContent, scrapeRepository, analyzeFileContent, generateAlgo } from '../services/analysisService.js';
+import { analyzeRepoContent, scrapeRepository, analyzeFileContent, generateAlgo, generateReadme } from '../services/analysisService.js';
 import { ApiResponse } from '../utils/responseHandler.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -34,4 +34,20 @@ export const generateTypingTest = asyncHandler(async(req,res)=>{
     //     throw new ApiError();
     // }
     res.status(200).json(new ApiResponse(200,typingTest,`Typing Test in ${language}`));
-})
+});
+
+export const generateRepoReadme = asyncHandler(async (req, res) => {
+    const { repo_url } = req.body;
+    
+    // First scrape the repository to get structure and content
+    const { dir_structure, code_content } = await scrapeRepository(repo_url);
+    
+    // Generate README using the new function
+    const readmeContent = await generateReadme(dir_structure, code_content);
+    
+    res.status(200).json(new ApiResponse(
+        200, 
+        readmeContent, 
+        `README generated for ${repo_url}`
+    ));
+});

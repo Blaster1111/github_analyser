@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { analyzeRepo } from '../services/api';
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from 'react';
+import { generateReadme } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
 import { SnakeGameLoader } from './SnakeGameLoader';
 
-export const RepoAnalysis = () => {
+export const ReadmeGenerator = () => {
     const [repoUrl, setRepoUrl] = useState('');
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState<string | null>(null);
     const [error, setError] = useState('');
+
     
     const handleAnalyze = async () => {
         if (!repoUrl) {
@@ -21,15 +21,26 @@ export const RepoAnalysis = () => {
         setResult(null);
         
         try {
-            const response = await analyzeRepo(repoUrl);
-            // Extract content from the response if it exists
+            const response = await generateReadme(repoUrl);
             const content = response?.data?.data?.choices?.[0]?.message?.content;
             setResult(content);
         } catch (err) {
-            setError('Failed to analyze repository. Please check the URL and try again.');
+            setError('Failed to generate README. Please check the URL and try again.');
         }
         
         setLoading(false);
+    };
+    
+    const copyToClipboard = () => {
+        if (result) {
+            navigator.clipboard.writeText(result)
+                .then(() => {
+                    alert('README copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
     };
     
     return (
@@ -68,7 +79,7 @@ export const RepoAnalysis = () => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                 >
-                    Analyze Repository
+                    Generate README
                 </motion.button>
             </motion.div>
             
@@ -99,13 +110,23 @@ export const RepoAnalysis = () => {
                 >
                     <div className="bg-gray-700 rounded-lg p-4 shadow-inner border border-gray-600">
                         <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-medium text-purple-300">Analysis Result</h3>
+                            <h3 className="text-lg font-medium text-purple-300">Generated README</h3>
+                            <button 
+                                onClick={copyToClipboard}
+                                className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-md transition-colors"
+                            >
+                                Copy Markdown
+                            </button>
                         </div>
-                        <div className="whitespace-pre-wrap break-words text-sm text-gray-200">
-                            <ReactMarkdown>
-                                {result}
-                            </ReactMarkdown>
-                        </div>
+                        <div className="whitespace-pre-wrap break-words text-sm text-gray-200 max-h-96 overflow-y-auto">
+    {result
+        ? result.split('\n').map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, index: Key | null | undefined) => (
+            <p key={index}>{line}</p>
+        ))
+        : null}
+</div>
+
+
                     </div>
                 </motion.div>
             )}

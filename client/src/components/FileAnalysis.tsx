@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { analyzeFile } from '../services/api';
-import { Loader } from './Loader';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { SnakeGameLoader } from './SnakeGameLoader';
 
 export const FileAnalysis = () => {
     const [repoUrl, setRepoUrl] = useState('');
@@ -40,6 +40,10 @@ export const FileAnalysis = () => {
             transition={{ duration: 0.5 }}
             className="p-6 space-y-4 bg-gray-800 rounded-lg shadow-lg"
         >
+            <AnimatePresence>
+                {loading && <SnakeGameLoader />}
+            </AnimatePresence>
+        
             <motion.div 
                 className="space-y-4"
                 initial={{ opacity: 0 }}
@@ -82,8 +86,6 @@ export const FileAnalysis = () => {
                     Analyze File
                 </motion.button>
             </motion.div>
-            
-            {loading && <Loader />}
             
             {error && (
                 <motion.div 

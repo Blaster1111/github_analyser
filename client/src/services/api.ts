@@ -13,3 +13,7 @@ export const analyzeFile = async (repo_url: string, file_name: string) => {
 export const scrapeRepo = async(repo_url: string)=>{
     return axios.post(`${API_BASE_URL}/scrape-repo`, {repo_url});
 }
+
+export const generateReadme = async (repo_url: string) => {
+    return axios.post(`${API_BASE_URL}/generate-readme`, { repo_url });
+};
