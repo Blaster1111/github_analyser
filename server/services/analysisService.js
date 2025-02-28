@@ -3,23 +3,35 @@
 
 
     const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+    // export const scrapeRepository = async (repo_url) => {
+    //     const driver = await setupDriver();
+
+    //     try {
+    //         const gitingest_url = repo_url.replace('github.com', 'gitingest.com');
+    //         await driver.get(gitingest_url);
+    //         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for elements to load
+
+    //         const dir_structure = await driver.findElement({ id: 'directory-structure-container' }).getText();
+    //         const code_content = await driver.findElement({ className: 'result-text' }).getText();
+
+    //         return { dir_structure, code_content };
+    //     } finally {
+    //         await driver.quit();
+    //     }
+    // };
+
     export const scrapeRepository = async (repo_url) => {
-        const driver = await setupDriver();
-
         try {
-            const gitingest_url = repo_url.replace('github.com', 'gitingest.com');
-            await driver.get(gitingest_url);
-            await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for elements to load
-
-            const dir_structure = await driver.findElement({ id: 'directory-structure-container' }).getText();
-            const code_content = await driver.findElement({ className: 'result-text' }).getText();
-
-            return { dir_structure, code_content };
-        } finally {
-            await driver.quit();
+            // Call the FastAPI server
+            const response = await axios.post("http://localhost:8000/fetch-repo", {
+                repo_url: repo_url
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching repo data:", error.response?.data || error.message);
+            throw new Error("Failed to fetch repository data");
         }
     };
-
 
     export const analyzeFileContent = async (dir_structure, code_content, file_name) => {
         const prompt = `
