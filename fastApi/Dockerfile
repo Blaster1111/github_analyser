@@ -32,11 +32,11 @@ RUN apt-get update && apt-get install -y \
     libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome
+# Install a specific version of Google Chrome (e.g., 133.0.6943.141 to match ChromeDriver)
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
-    && apt-get install -y google-chrome-stable \
+    && apt-get install -y google-chrome-stable=133.0.6943.141-1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory

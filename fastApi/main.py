@@ -25,7 +25,8 @@ def setup_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--window-size=1280,720")  # Reduced from 1920,1080
+    options.add_argument("--disable-extensions")  # Additional optimization
     
     try:
         service = Service(ChromeDriverManager().install())
@@ -60,8 +61,8 @@ def scrape_gitingest(request: RepoRequest):
         page_source = driver.page_source
         logger.info(f"Full page data scraped: {page_source}")
         
-        # Wait 5 seconds before scraping specific elements
-        logger.info("Waiting 5 seconds before scraping elements...")
+        # Wait 15 seconds before scraping specific elements
+        logger.info("Waiting 15 seconds before scraping elements...")
         time.sleep(15)
         
         wait = WebDriverWait(driver, 30)  # Timeout for element waits
@@ -94,9 +95,12 @@ def scrape_gitingest(request: RepoRequest):
         raise HTTPException(status_code=500, detail=f"Scraping error: {str(e)}")
     finally:
         if driver:
-            logger.info("Closing driver")
-            driver.quit()
+            try:
+                logger.info("Closing driver")
+                driver.quit()
+            except Exception as e:
+                logger.error(f"Error closing driver: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
