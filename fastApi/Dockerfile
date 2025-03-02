@@ -1,65 +1,42 @@
-# Use Python base image
+# Use a slim Python base image
 FROM python:3.9-slim
 
-# Install required dependencies
+# Install system dependencies for Chrome
 RUN apt-get update && apt-get install -y \
     wget \
-    curl \
-    gnupg \
     unzip \
-    ca-certificates \
-    fonts-liberation \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libatspi2.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libdrm2 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnspr4 \
+    curl \
+    libglib2.0-0 \
     libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxkbcommon0 \
-    libxrandr2 \
-    xdg-utils \
-    libu2f-udev \
-    apt-transport-https \
+    libgconf-2-4 \
+    libfontconfig1 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome for Testing (Latest)
-RUN wget -O /tmp/chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
-    && unzip /tmp/chrome-linux64.zip -d /opt/ \
-    && mv /opt/chrome-linux64 /opt/google-chrome \
-    && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
-    && rm /tmp/chrome-linux64.zip
+# Install Chrome
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver (Matching version)
-RUN wget -O /tmp/chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
-    && unzip /tmp/chromedriver-linux64.zip -d /tmp/ \
-    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
-    && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf /tmp/chromedriver-linux64.zip /tmp/chromedriver-linux64
-
-# Create and set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy and install dependencies
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application files
+# Copy application files
 COPY . .
 
-# Expose the required port
+# Expose port for Render (Render uses 10000 by default, but your app uses 8000)
 EXPOSE 8000
 
-# Ensure ChromeDriver is detected properly
-ENV PATH="/usr/local/bin:${PATH}"
-ENV USE_CHROMEDRIVER_ON_PATH=true
+# Ensure Chrome is in PATH
+ENV PATH="/usr/bin/google-chrome:${PATH}"
 
 # Start FastAPI app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
