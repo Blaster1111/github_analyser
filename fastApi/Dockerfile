@@ -30,18 +30,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chrome for Testing
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip \
+# Install latest Chrome for Testing (133.0.6943.141)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
     && unzip chrome-linux64.zip -d /opt/ \
     && mv /opt/chrome-linux64 /opt/google-chrome \
     && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
     && rm chrome-linux64.zip
 
-# Install ChromeDriver (compatible version)
-RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
-    && unzip chromedriver_linux64.zip -d /tmp/ \
-    && mv /tmp/chromedriver /usr/local/bin/chromedriver \
+# Install matching ChromeDriver
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip -d /usr/local/bin/ \
     && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf chromedriver_linux64.zip /tmp/chromedriver
+    && rm -rf chromedriver-linux64.zip
+
 
 # Create and set the working directory
 WORKDIR /app
