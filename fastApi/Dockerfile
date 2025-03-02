@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
-ENV DOCKER_BUILDKIT=0
-
 # Use a slim Python base image
 FROM python:3.9-slim
 
-# Install system dependencies for Chrome and gnupg
+# Disable BuildKit to avoid socket connection issues on Render
+ENV DOCKER_BUILDKIT=0
+
+# Install system dependencies including gnupg and Chrome requirements
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
@@ -19,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     libxi6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome
+# Install Google Chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
@@ -34,9 +35,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
-COPY . .
+COPY main.py .
 
-# Expose port
+# Expose port (Render free tier defaults to 10000, but we'll use 8000 and adjust if needed)
 EXPOSE 8000
 
 # Ensure Chrome is in PATH
