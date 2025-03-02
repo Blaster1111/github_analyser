@@ -31,18 +31,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chrome for Testing (Latest)
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
-    && unzip chrome-linux64.zip -d /opt/ \
+RUN wget -O /tmp/chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
+    && unzip /tmp/chrome-linux64.zip -d /opt/ \
     && mv /opt/chrome-linux64 /opt/google-chrome \
     && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
-    && rm chrome-linux64.zip
+    && rm /tmp/chrome-linux64.zip
 
-# Install ChromeDriver (Latest compatible version)
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
-    && unzip chromedriver_linux64.zip -d /tmp/ \
-    && mv /tmp/chromedriver /usr/local/bin/chromedriver \
+# Install ChromeDriver (Matching version)
+RUN wget -O /tmp/chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
+    && unzip /tmp/chromedriver-linux64.zip -d /tmp/ \
+    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf chromedriver_linux64.zip /tmp/chromedriver
+    && rm -rf /tmp/chromedriver-linux64.zip /tmp/chromedriver-linux64
 
 # Create and set the working directory
 WORKDIR /app
