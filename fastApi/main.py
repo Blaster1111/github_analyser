@@ -55,6 +55,7 @@ def scrape_gitingest(request: RepoRequest):
         logger.info(f"Navigating to: {gitingest_url}")
         
         driver.get(gitingest_url)
+        time.sleep(10)
         logger.info("Page loaded")
         
         # Log the entire page source after loading
