@@ -27,12 +27,18 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome
-RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+# Install Chrome version 112
+RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.165-1_amd64.deb \
     && apt-get update \
-    && apt-get install -y ./google-chrome-stable_current_amd64.deb \
-    && rm ./google-chrome-stable_current_amd64.deb \
+    && apt-get install -y ./google-chrome-stable_112.0.5615.165-1_amd64.deb \
+    && rm ./google-chrome-stable_112.0.5615.165-1_amd64.deb \
     && rm -rf /var/lib/apt/lists/*
+
+# Download and set up ChromeDriver version 112
+RUN wget -q https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
+    && rm chromedriver_linux64.zip \
+    && chmod +x /usr/local/bin/chromedriver
 
 # Create app directory
 WORKDIR /app
@@ -44,11 +50,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the app files
 COPY . .
 
-# Environment variable to use ChromeDriver from webdriver-manager
-ENV PATH="/app/.wdm/drivers/chromedriver/linux64:${PATH}"
-
 # Expose port
 EXPOSE 8000
+
+# Override the webdriver-manager to use our local ChromeDriver
+ENV PATH="/usr/local/bin:${PATH}"
+ENV USE_CHROMEDRIVER_ON_PATH=true
 
 # Run FastAPI app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
