@@ -2,14 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 import logging
-import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +25,7 @@ def setup_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     
-    # Additional stability options
+    # Additional options to help with stability
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-extensions")
@@ -40,10 +37,7 @@ def setup_driver():
     options.add_argument("--log-level=3")
     
     try:
-        # Use the pre-installed ChromeDriver (version 114)
-        service = Service('/usr/local/bin/chromedriver')
-        driver = webdriver.Chrome(service=service, options=options)
-        logger.info("Using pre-installed ChromeDriver")
+        driver = webdriver.Chrome(options=options)
         return driver
     except Exception as e:
         logger.error(f"Failed to create Chrome driver: {str(e)}")
@@ -68,8 +62,6 @@ def scrape_gitingest(request: RepoRequest):
             gitingest_url = request.repo_url.replace("github.com", "gitingest.com")
             logger.info(f"Navigating to: {gitingest_url}")
             
-            # Set page load timeout
-            driver.set_page_load_timeout(60)
             driver.get(gitingest_url)
             logger.info("Page loaded")
             
@@ -106,4 +98,4 @@ def scrape_gitingest(request: RepoRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
