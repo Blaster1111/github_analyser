@@ -3,4 +3,3 @@ uvicorn
 selenium
 webdriver-manager
 pydantic
-requests

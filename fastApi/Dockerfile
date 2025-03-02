@@ -1,11 +1,12 @@
 # Use a slim Python base image
 FROM python:3.9-slim
 
-# Install system dependencies for Chrome
+# Install system dependencies for Chrome and gnupg
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
+    gnupg \
     libglib2.0-0 \
     libnss3 \
     libgconf-2-4 \
@@ -32,7 +33,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY . .
 
-# Expose port for Render (Render uses 10000 by default, but your app uses 8000)
+# Expose port (Render uses 10000 by default, but your app specifies 8000)
 EXPOSE 8000
 
 # Ensure Chrome is in PATH
