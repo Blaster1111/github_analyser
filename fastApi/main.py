@@ -55,16 +55,24 @@ def scrape_gitingest(request: RepoRequest):
         driver.get(gitingest_url)
         logger.info("Page loaded")
         
-        wait = WebDriverWait(driver, 60)
+        wait = WebDriverWait(driver, 30)  # Reduced timeout to 30s for faster failure
         logger.info("Waiting for directory structure...")
-        dir_structure = wait.until(
-            EC.presence_of_element_located((By.ID, "directory-structure-container"))
-        ).text
+        try:
+            dir_structure = wait.until(
+                EC.presence_of_element_located((By.ID, "directory-structure-container"))
+            ).text
+        except Exception as e:
+            logger.error(f"Failed to find directory structure: {str(e)}")
+            raise
         
         logger.info("Waiting for code content...")
-        code_content = wait.until(
-            EC.presence_of_element_located((By.CLASS_NAME, "result-text"))
-        ).text
+        try:
+            code_content = wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, "result-text"))
+            ).text
+        except Exception as e:
+            logger.error(f"Failed to find code content: {str(e)}")
+            raise
         
         return {
             "directory_structure": dir_structure,
@@ -80,4 +88,4 @@ def scrape_gitingest(request: RepoRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
