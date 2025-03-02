@@ -11,12 +11,12 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies early so we can use Playwright CLI
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright dependencies for Chromium
-RUN playwright install-deps
+# Install Playwright system dependencies and browsers
+RUN playwright install-deps && playwright install chromium
 
 # Set working directory
 WORKDIR /app
