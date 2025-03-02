@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1
+ENV DOCKER_BUILDKIT=0
+
 # Use a slim Python base image
 FROM python:3.9-slim
 
@@ -33,7 +36,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY . .
 
-# Expose port (Render uses 10000 by default, but your app specifies 8000)
+# Expose port
 EXPOSE 8000
 
 # Ensure Chrome is in PATH
