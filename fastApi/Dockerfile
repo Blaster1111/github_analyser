@@ -24,12 +24,18 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon0 \
     libxrandr2 \
     xdg-utils \
+    libglib2.0-0 \
+    libu2f-udev \
+    libvulkan1 \
     --no-install-recommends
 
 # Install Chrome
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
+
+# Verify Chrome installation and get version
+RUN google-chrome --version
 
 # Create app directory
 WORKDIR /app
@@ -40,6 +46,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
+
+# Create a non-root user to run Chrome
+RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome \
+    && mkdir -p /home/chrome/Downloads \
+    && chown -R chrome:chrome /home/chrome \
+    && chown -R chrome:chrome /app
+
+# Switch to non-root user
+USER chrome
 
 # Expose port
 EXPOSE 8000
