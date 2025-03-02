@@ -35,9 +35,14 @@ def scrape_gitingest(request: RepoRequest):
             page_source = page.content()
             logger.info(f"Full page data scraped: {page_source}")
             
-            # Wait for the "Loading..." spinner to disappear
+            # Simulate form submission
+            logger.info("Filling and submitting form...")
+            page.fill("#input_text", gitingest_url.split("gitingest.com/")[1])  # Extract repo part
+            page.click("button[type=submit]")
+            
+            # Wait for loader to disappear
             logger.info("Waiting for loading to complete...")
-            page.wait_for_selector(".loader", state="detached", timeout=60000)  # Wait up to 60s for loader to vanish
+            page.wait_for_selector(".loader", state="detached", timeout=60000)
             
             logger.info("Waiting for directory structure...")
             dir_structure = page.wait_for_selector("#directory-structure-container", timeout=30000).text_content()
