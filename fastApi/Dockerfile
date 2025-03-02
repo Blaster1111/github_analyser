@@ -25,19 +25,20 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon0 \
     libxrandr2 \
     xdg-utils \
+    apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome version 112
-RUN wget -q https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_112.0.5615.165-1_amd64.deb \
-    && apt-get update \
-    && apt-get install -y ./google-chrome-stable_112.0.5615.165-1_amd64.deb \
-    && rm ./google-chrome-stable_112.0.5615.165-1_amd64.deb \
-    && rm -rf /var/lib/apt/lists/*
+# Install Chrome directly from the Chrome for Testing Archive
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip \
+    && unzip chrome-linux64.zip -d /opt/ \
+    && ln -s /opt/chrome-linux64/chrome /usr/bin/google-chrome \
+    && rm chrome-linux64.zip
 
-# Download and set up ChromeDriver version 112
-RUN wget -q https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip \
-    && unzip chromedriver_linux64.zip -d /usr/local/bin/ \
-    && rm chromedriver_linux64.zip \
+# Download and set up ChromeDriver version 114
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip -d /tmp/ \
+    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+    && rm -rf chromedriver-linux64.zip /tmp/chromedriver-linux64 \
     && chmod +x /usr/local/bin/chromedriver
 
 # Create app directory

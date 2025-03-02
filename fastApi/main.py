@@ -40,9 +40,10 @@ def setup_driver():
     options.add_argument("--log-level=3")
     
     try:
-        # Use ChromeDriverManager to download the appropriate ChromeDriver version
-        service = Service(ChromeDriverManager().install())
+        # Use the pre-installed ChromeDriver (version 114)
+        service = Service('/usr/local/bin/chromedriver')
         driver = webdriver.Chrome(service=service, options=options)
+        logger.info("Using pre-installed ChromeDriver")
         return driver
     except Exception as e:
         logger.error(f"Failed to create Chrome driver: {str(e)}")
