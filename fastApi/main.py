@@ -62,7 +62,7 @@ def scrape_gitingest(request: RepoRequest):
         
         # Wait 5 seconds before scraping specific elements
         logger.info("Waiting 5 seconds before scraping elements...")
-        time.sleep(5)
+        time.sleep(15)
         
         wait = WebDriverWait(driver, 30)  # Timeout for element waits
         logger.info("Waiting for directory structure...")
