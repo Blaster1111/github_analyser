@@ -4,7 +4,6 @@ from playwright.sync_api import sync_playwright
 import logging
 import time
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -34,11 +33,9 @@ def scrape_gitingest(request: RepoRequest):
             page.goto(gitingest_url)
             logger.info("Page loaded")
             
-            # Log the entire page source after loading
             page_source = page.content()
             logger.info(f"Full page data scraped: {page_source}")
             
-            # Wait 15 seconds before scraping specific elements
             logger.info("Waiting 15 seconds before scraping elements...")
             time.sleep(15)
             
