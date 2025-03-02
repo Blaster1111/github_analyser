@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import logging
+import time
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -55,12 +56,21 @@ def scrape_gitingest(request: RepoRequest):
         driver.get(gitingest_url)
         logger.info("Page loaded")
         
-        wait = WebDriverWait(driver, 30)  # Reduced timeout to 30s for faster failure
+        # Log the entire page source after loading
+        page_source = driver.page_source
+        logger.info(f"Full page data scraped: {page_source}")
+        
+        # Wait 5 seconds before scraping specific elements
+        logger.info("Waiting 5 seconds before scraping elements...")
+        time.sleep(5)
+        
+        wait = WebDriverWait(driver, 30)  # Timeout for element waits
         logger.info("Waiting for directory structure...")
         try:
             dir_structure = wait.until(
                 EC.presence_of_element_located((By.ID, "directory-structure-container"))
             ).text
+            logger.info(f"Directory structure found: {dir_structure}")
         except Exception as e:
             logger.error(f"Failed to find directory structure: {str(e)}")
             raise
@@ -70,6 +80,7 @@ def scrape_gitingest(request: RepoRequest):
             code_content = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, "result-text"))
             ).text
+            logger.info(f"Code content found: {code_content}")
         except Exception as e:
             logger.error(f"Failed to find code content: {str(e)}")
             raise
