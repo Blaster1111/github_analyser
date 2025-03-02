@@ -6,40 +6,34 @@ export const SnakeGameLoader: React.FC = () => {
   const CELL_SIZE = 20;
   const BOARD_WIDTH = GRID_SIZE;
   const BOARD_HEIGHT = GRID_SIZE;
-  
-  const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
-  const [food, setFood] = useState({ x: 5, y: 5 });
-  const [direction, setDirection] = useState("RIGHT");
-  const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  
+
+  const [snake, setSnake] = useState<{ x: number; y: number }[]>([{ x: 10, y: 10 }]);
+  const [food, setFood] = useState<{ x: number; y: number }>({ x: 5, y: 5 });
+  const [direction, setDirection] = useState<"UP" | "DOWN" | "LEFT" | "RIGHT">("RIGHT");
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [score, setScore] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [speed, setSpeed] = useState<number>(200);
+
   const gameLoopRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number>(Date.now());
   const directionQueueRef = useRef<string[]>([]);
   const boardRef = useRef<HTMLDivElement>(null);
-  
-  const [speed, setSpeed] = useState(200); 
 
-  const generateFood = () => {
+  const generateFood = (): { x: number; y: number } => {
     const newFood = {
       x: Math.floor(Math.random() * BOARD_WIDTH),
-      y: Math.floor(Math.random() * BOARD_HEIGHT)
+      y: Math.floor(Math.random() * BOARD_HEIGHT),
     };
-    
-    const isOnSnake = snake.some(segment => 
-      segment.x === newFood.x && segment.y === newFood.y
+
+    const isOnSnake = snake.some(
+      (segment) => segment.x === newFood.x && segment.y === newFood.y
     );
-    
-    if (isOnSnake) {
-      return generateFood();
-    }
-    
-    return newFood;
+
+    return isOnSnake ? generateFood() : newFood;
   };
-  
-  // Reset game
-  const resetGame = () => {
+
+  const resetGame = (): void => {
     setSnake([{ x: 10, y: 10 }]);
     setFood(generateFood());
     setDirection("RIGHT");
@@ -48,96 +42,84 @@ export const SnakeGameLoader: React.FC = () => {
     setSpeed(200);
     directionQueueRef.current = [];
   };
-  
-  // Handle keyboard input
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent default behavior for arrow keys to avoid page scrolling
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-        e.preventDefault();
-      }
-      
-      // Space key pauses/resumes the game
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      e.preventDefault();
+
       if (e.key === " ") {
-        setIsPaused(prev => !prev);
+        setIsPaused((prev) => !prev);
         return;
       }
-      
-      // If game is over, any key restarts
+
       if (gameOver && e.key !== " ") {
         resetGame();
         return;
       }
-      
-      // Direction queue to handle rapid key presses
+
       const newDirection = (() => {
-        switch (e.key) {
-          case "ArrowUp":
+        switch (e.key.toLowerCase()) {
+          case "arrowup":
+          case "w":
             return direction !== "DOWN" ? "UP" : direction;
-          case "ArrowDown":
+          case "arrowdown":
+          case "s":
             return direction !== "UP" ? "DOWN" : direction;
-          case "ArrowLeft":
+          case "arrowleft":
+          case "a":
             return direction !== "RIGHT" ? "LEFT" : direction;
-          case "ArrowRight":
+          case "arrowright":
+          case "d":
             return direction !== "LEFT" ? "RIGHT" : direction;
           default:
             return null;
         }
       })();
-      
+
       if (newDirection && newDirection !== direction) {
         directionQueueRef.current.push(newDirection);
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
   }, [direction, gameOver]);
-  
-  // Focus the game board on initial render
+
   useEffect(() => {
-    if (boardRef.current) {
-      boardRef.current.focus();
-    }
+    if (boardRef.current) boardRef.current.focus();
   }, []);
 
-  // Main game loop
   useEffect(() => {
     if (gameOver || isPaused) return;
-    
-    const gameLoop = () => {
+
+    const gameLoop = (): void => {
       const now = Date.now();
       const elapsed = now - lastUpdateTimeRef.current;
-      
+
       if (elapsed > speed) {
         lastUpdateTimeRef.current = now;
         updateGame();
       }
-      
+
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     };
-    
+
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-    
+
     return () => {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     };
   }, [snake, food, direction, gameOver, isPaused, speed]);
-  
-  // Update game state
-  const updateGame = () => {
-    // Process direction queue
+
+  const updateGame = (): void => {
     if (directionQueueRef.current.length > 0) {
-      const nextDirection = directionQueueRef.current.shift() as any;
-      setDirection(nextDirection);
+      setDirection(directionQueueRef.current.shift() as typeof direction);
     }
-  
-    // Move snake
+
     const head = { ...snake[0] };
-  
     switch (direction) {
       case "UP":
         head.y -= 1;
@@ -152,54 +134,44 @@ export const SnakeGameLoader: React.FC = () => {
         head.x += 1;
         break;
     }
-    //boundary checker
-    if (
-      head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT
-    ) {
-      setGameOver(true);
-      return;
-    }
-  
-    //self touch checker
-    const selfCollision = snake.slice(1).some(
-      segment => segment.x === head.x && segment.y === head.y
-    );
-  
-    if (selfCollision) {
-      setGameOver(true);
-      return;
-    }
-  
-  
-    const newSnake = [head, ...snake];
 
+    if (head.x < 0 || head.x >= BOARD_WIDTH || head.y < 0 || head.y >= BOARD_HEIGHT) {
+      setGameOver(true);
+      return;
+    }
+
+    if (snake.slice(1).some((segment) => segment.x === head.x && segment.y === head.y)) {
+      setGameOver(true);
+      return;
+    }
+
+    const newSnake = [head, ...snake];
     if (head.x === food.x && head.y === food.y) {
-      setScore(prev => prev + 1);
-      setSpeed(prev => Math.max(70, prev - 5));
+      setScore((prev) => prev + 1);
+      setSpeed((prev) => Math.max(70, prev - 5));
       setFood(generateFood());
     } else {
       newSnake.pop();
     }
-  
+
     setSnake(newSnake);
   };
-  
-  
-  const handleTouchStart = (direction: string) => {
+
+  const handleTouchStart = (newDirection: typeof direction): void => {
     if (gameOver) {
       resetGame();
       return;
     }
-    
-    const validMoves: Record<string, string> = {
+
+    const validMoves: Record<string, typeof direction> = {
       UP: direction !== "DOWN" ? "UP" : direction,
       DOWN: direction !== "UP" ? "DOWN" : direction,
       LEFT: direction !== "RIGHT" ? "LEFT" : direction,
-      RIGHT: direction !== "LEFT" ? "RIGHT" : direction
+      RIGHT: direction !== "LEFT" ? "RIGHT" : direction,
     };
-    
-    if (validMoves[direction] && validMoves[direction] !== direction) {
-      directionQueueRef.current.push(validMoves[direction]);
+
+    if (validMoves[newDirection] && validMoves[newDirection] !== direction) {
+      directionQueueRef.current = [validMoves[newDirection]]; // Replace queue instead of pushing
     }
   };
 
@@ -210,24 +182,23 @@ export const SnakeGameLoader: React.FC = () => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900/80 backdrop-blur-sm"
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center touch-none">
         <h3 className="text-xl font-bold text-green-300 mb-2">Loading...</h3>
         <p className="text-gray-300 mb-4">
-          Play Snake while waiting! Use arrow keys to control.
+          Play Snake while waiting! Use arrow keys or WASD to control (Space to pause)
         </p>
-        
-        {/* Game board */}
-        <div 
+
+        <div
           ref={boardRef}
           tabIndex={0}
-          className="relative bg-gray-800 border-2 border-gray-700 focus:outline-none"
-          style={{ 
-            width: BOARD_WIDTH * CELL_SIZE, 
+          className="relative bg-gray-800 border-2 border-gray-700 focus:outline-none touch-none"
+          style={{
+            width: BOARD_WIDTH * CELL_SIZE,
             height: BOARD_HEIGHT * CELL_SIZE,
+            userSelect: "none",
           }}
         >
-          {/* Food */}
-          <div 
+          <div
             className="absolute bg-red-500 rounded-full"
             style={{
               width: CELL_SIZE - 2,
@@ -236,12 +207,11 @@ export const SnakeGameLoader: React.FC = () => {
               top: food.y * CELL_SIZE + 1,
             }}
           />
-          
-          {/* Snake */}
+
           {snake.map((segment, index) => (
-            <div 
+            <div
               key={`${segment.x}-${segment.y}-${index}`}
-              className={`absolute ${index === 0 ? 'bg-green-400' : 'bg-green-500'} rounded-sm`}
+              className={`absolute ${index === 0 ? "bg-green-400" : "bg-green-500"} rounded-sm`}
               style={{
                 width: CELL_SIZE - 2,
                 height: CELL_SIZE - 2,
@@ -250,65 +220,60 @@ export const SnakeGameLoader: React.FC = () => {
               }}
             />
           ))}
-          
-          {/* Game over overlay */}
+
           {gameOver && (
             <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
               <h2 className="text-white text-xl font-bold mb-2">Game Over</h2>
               <p className="text-white mb-4">Score: {score}</p>
-              <button 
+              <button
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 onClick={resetGame}
+                onTouchStart={resetGame}
               >
                 Play Again
               </button>
             </div>
           )}
 
-          {/* Pause overlay */}
           {isPaused && !gameOver && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
               <h2 className="text-white text-xl font-bold">Paused</h2>
             </div>
           )}
         </div>
-        
-        {/* Score */}
-        <div className="text-white mt-2">
-          Score: {score}
-        </div>
-        
-        {/* Touch controls for mobile */}
-        <div className="flex flex-col items-center mt-4 md:hidden">
-          <button 
-            className="w-16 h-12 bg-gray-700 text-white mb-2 rounded"
-            onClick={() => handleTouchStart("UP")}
+
+        <div className="text-white mt-2">Score: {score}</div>
+
+        <div className="flex flex-col items-center mt-4 touch-none select-none">
+          <button
+            className="w-16 h-12 bg-gray-700 text-white mb-2 rounded touch-none"
+            onTouchStart={() => handleTouchStart("UP")}
           >
             ↑
           </button>
           <div className="flex justify-center">
-            <button 
-              className="w-16 h-12 bg-gray-700 text-white mx-2 rounded"
-              onClick={() => handleTouchStart("LEFT")}
+            <button
+              className="w-16 h-12 bg-gray-700 text-white mx-2 rounded touch-none"
+              onTouchStart={() => handleTouchStart("LEFT")}
             >
               ←
             </button>
-            <button 
-              className="w-16 h-12 bg-gray-700 text-white mx-2 rounded"
-              onClick={() => handleTouchStart("RIGHT")}
+            <button
+              className="w-16 h-12 bg-gray-700 text-white mx-2 rounded touch-none"
+              onTouchStart={() => handleTouchStart("RIGHT")}
             >
               →
             </button>
           </div>
-          <button 
-            className="w-16 h-12 bg-gray-700 text-white mt-2 rounded"
-            onClick={() => handleTouchStart("DOWN")}
+          <button
+            className="w-16 h-12 bg-gray-700 text-white mt-2 rounded touch-none"
+            onTouchStart={() => handleTouchStart("DOWN")}
           >
             ↓
           </button>
-          <button 
-            className="w-24 h-12 bg-gray-700 text-white mt-4 rounded"
-            onClick={() => setIsPaused(prev => !prev)}
+          <button
+            className="w-24 h-12 bg-gray-700 text-white mt-4 rounded touch-none"
+            onTouchStart={() => setIsPaused((prev) => !prev)}
           >
             {isPaused ? "Resume" : "Pause"}
           </button>

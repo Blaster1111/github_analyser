@@ -24,14 +24,16 @@ const OPENROUTER_API_URL = `${process.env.OPENROUTER_API_URL}`
 
 export const scrapeRepository = async (repo_url) => {
     try {
-        // Call the FastAPI server
         const response = await axios.post(`${process.env.SCRAPING_ENDPOINT}`, {
             repo_url: repo_url
-        });
+        }, { timeout: 10000 }); // Add timeout to avoid hanging
         return response.data;
     } catch (error) {
+        if (error.code === 'ECONNREFUSED' || error.response?.status === 503 || error.code === 'ETIMEDOUT') {
+            throw new Error("Scraping service is currently unavailable. Please try again later.");
+        }
         console.error("Error fetching repo data:", error.response?.data || error.message);
-        throw new Error("Failed to fetch repository data");
+        throw new Error("Failed to fetch repository data: " + (error.response?.data?.detail || error.message));
     }
 };
 
