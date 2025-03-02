@@ -1,11 +1,13 @@
 # Use Python base image
 FROM python:3.9-slim
 
-# Install Chrome dependencies
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
     wget \
+    curl \
     gnupg \
     unzip \
+    ca-certificates \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -24,36 +26,39 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon0 \
     libxrandr2 \
     xdg-utils \
+    apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and install Chrome
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update && apt-get install -y google-chrome-stable
+# Install Chrome for Testing
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip \
+    && unzip chrome-linux64.zip -d /opt/ \
+    && mv /opt/chrome-linux64 /opt/google-chrome \
+    && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
+    && rm chrome-linux64.zip
 
-# Install Chromedriver
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}') && \
-    CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION) && \
-    wget -q https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    mv chromedriver /usr/local/bin/ && \
-    chmod +x /usr/local/bin/chromedriver
+# Install ChromeDriver (compatible version)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip -d /tmp/ \
+    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+    && chmod +x /usr/local/bin/chromedriver \
+    && rm -rf chromedriver-linux64.zip /tmp/chromedriver-linux64
 
-
-# Set environment variables for Chrome
-ENV DISPLAY=:99
-
-# Set the working directory
+# Create and set the working directory
 WORKDIR /app
 
-# Copy files
-COPY . .
-
-# Install dependencies
+# Copy and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
+# Copy the application files
+COPY . .
+
+# Expose the required port
 EXPOSE 8000
 
-# Start FastAPI application
+# Ensure ChromeDriver is detected properly
+ENV PATH="/usr/local/bin:${PATH}"
+ENV USE_CHROMEDRIVER_ON_PATH=true
+
+# Start FastAPI app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
