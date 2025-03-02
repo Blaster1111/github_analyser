@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from playwright.sync_api import sync_playwright
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,9 +36,8 @@ def scrape_gitingest(request: RepoRequest):
             page_source = page.content()
             logger.info(f"Full page data scraped: {page_source}")
             
-            # Wait for the "Loading..." spinner to disappear
-            logger.info("Waiting for loading to complete...")
-            page.wait_for_selector(".loader", state="detached", timeout=60000)  # Wait up to 60s for loader to vanish
+            logger.info("Waiting 15 seconds before scraping elements...")
+            time.sleep(15)
             
             logger.info("Waiting for directory structure...")
             dir_structure = page.wait_for_selector("#directory-structure-container", timeout=30000).text_content()
