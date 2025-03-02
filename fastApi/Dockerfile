@@ -1,10 +1,9 @@
 # Use Python base image
 FROM python:3.9-slim
 
-# Install Chrome and ChromeDriver dependencies
+# Install Chrome dependencies
 RUN apt-get update && apt-get install -y \
     wget \
-    curl \
     gnupg \
     unzip \
     ca-certificates \
@@ -28,20 +27,12 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome using a fixed deb package
+# Install Chrome
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get update \
     && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && rm -rf /var/lib/apt/lists/*
-
-# Get Chrome version and download matching ChromeDriver
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | awk -F'.' '{print $1}') \
-    && wget -q -O chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}.0.0.0/linux64/chromedriver-linux64.zip \
-    && unzip chromedriver.zip \
-    && mv chromedriver-linux64/chromedriver /usr/local/bin/ \
-    && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf chromedriver.zip chromedriver-linux64
 
 # Create app directory
 WORKDIR /app
@@ -52,6 +43,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the app files
 COPY . .
+
+# Environment variable to use ChromeDriver from webdriver-manager
+ENV PATH="/app/.wdm/drivers/chromedriver/linux64:${PATH}"
 
 # Expose port
 EXPOSE 8000
