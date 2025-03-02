@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import logging
 import os
@@ -39,8 +40,8 @@ def setup_driver():
     options.add_argument("--log-level=3")
     
     try:
-        # Create a Service object
-        service = Service(executable_path="/usr/local/bin/chromedriver")
+        # Use ChromeDriverManager to download the appropriate ChromeDriver version
+        service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
         return driver
     except Exception as e:
