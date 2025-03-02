@@ -30,21 +30,19 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Get latest Chrome version dynamically
-RUN LATEST_CHROME=$(curl -sL https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | grep -oP '(?<="stable": ")[^"]*') \
-    && wget -q "https://storage.googleapis.com/chrome-for-testing-public/${LATEST_CHROME}/linux64/chrome-linux64.zip" \
+# Install Chrome for Testing (Latest)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
     && unzip chrome-linux64.zip -d /opt/ \
     && mv /opt/chrome-linux64 /opt/google-chrome \
     && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
     && rm chrome-linux64.zip
 
-# Get latest ChromeDriver version dynamically
-RUN LATEST_DRIVER=$(curl -sL https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone.json | grep -oP '(?<="stable": ")[^"]*') \
-    && wget -q "https://storage.googleapis.com/chrome-for-testing-public/${LATEST_DRIVER}/linux64/chromedriver-linux64.zip" \
-    && unzip chromedriver-linux64.zip -d /tmp/ \
-    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+# Install ChromeDriver (Latest compatible version)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver_linux64.zip -d /tmp/ \
+    && mv /tmp/chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf chromedriver-linux64.zip /tmp/chromedriver-linux64
+    && rm -rf chromedriver_linux64.zip /tmp/chromedriver
 
 # Create and set the working directory
 WORKDIR /app
