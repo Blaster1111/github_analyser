@@ -1,4 +1,4 @@
-**Gitlyser**
+**Gitlyser** (gitlyser.netlify.app)
 ================
 
 **Project Title** 🚀  
