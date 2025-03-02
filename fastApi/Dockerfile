@@ -37,11 +37,11 @@ RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.
     && rm chrome-linux64.zip
 
 # Install ChromeDriver (compatible version)
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chromedriver-linux64.zip \
-    && unzip chromedriver-linux64.zip -d /tmp/ \
-    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
+RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip -d /tmp/ \
+    && mv /tmp/chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf chromedriver-linux64.zip /tmp/chromedriver-linux64
+    && rm -rf chromedriver_linux64.zip /tmp/chromedriver
 
 # Create and set the working directory
 WORKDIR /app
