@@ -26,18 +26,19 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon0 \
     libxrandr2 \
     xdg-utils \
+    libu2f-udev \
     apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome for Testing
-RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/114.0.5735.90/linux64/chrome-linux64.zip \
+# Install Chrome for Testing (Latest)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chrome-linux64.zip \
     && unzip chrome-linux64.zip -d /opt/ \
     && mv /opt/chrome-linux64 /opt/google-chrome \
     && ln -s /opt/google-chrome/chrome /usr/local/bin/google-chrome \
     && rm chrome-linux64.zip
 
-# Install ChromeDriver (compatible version)
-RUN wget -q https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
+# Install ChromeDriver (Latest compatible version)
+RUN wget -q https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.141/linux64/chromedriver-linux64.zip \
     && unzip chromedriver_linux64.zip -d /tmp/ \
     && mv /tmp/chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver \
