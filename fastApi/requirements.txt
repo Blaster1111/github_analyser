@@ -1,5 +1,4 @@
 fastapi
 uvicorn
-selenium
-webdriver-manager
+playwright
 pydantic

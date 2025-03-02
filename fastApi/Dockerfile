@@ -1,19 +1,14 @@
 # syntax=docker/dockerfile:1
-# Use a slim Python base image
 FROM python:3.9-slim
 
-# Disable BuildKit to avoid socket connection issues on Render
 ENV DOCKER_BUILDKIT=0
 
-# Install system dependencies including gnupg and Chrome requirements
+# Install system dependencies for Playwright
 RUN apt-get update && apt-get install -y \
     wget \
-    unzip \
     curl \
-    gnupg \
     libglib2.0-0 \
     libnss3 \
-    libgconf-2-4 \
     libfontconfig1 \
     libxrender1 \
     libxtst6 \
@@ -32,13 +27,6 @@ RUN apt-get update && apt-get install -y \
     libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install a specific version of Google Chrome (e.g., 133.0.6943.141 to match ChromeDriver)
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable=133.0.6943.141-1 \
-    && rm -rf /var/lib/apt/lists/*
-
 # Set working directory
 WORKDIR /app
 
@@ -46,14 +34,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Playwright browsers
+RUN playwright install chromium
+
 # Copy application files
 COPY main.py .
 
 # Expose port
 EXPOSE 8000
-
-# Ensure Chrome is in PATH
-ENV PATH="/usr/bin/google-chrome:${PATH}"
 
 # Start FastAPI app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
