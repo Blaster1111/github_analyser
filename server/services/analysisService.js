@@ -24,7 +24,7 @@ const OPENROUTER_API_URL = `${process.env.OPENROUTER_API_URL}`
 
 export const scrapeRepository = async (repo_url) => {
     try {
-        const response = await axios.post(`${process.env.SCRAPING_ENDPOINT}`, {
+        const response = await axios.post("https://gitlyser-scraper.onrender.com/scrape", {
             repo_url: repo_url
         }, { timeout: 180000 }); 
         return response.data;
