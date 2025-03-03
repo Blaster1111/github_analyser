@@ -26,7 +26,7 @@ export const scrapeRepository = async (repo_url) => {
     try {
         const response = await axios.post("https://gitlyser-scraper.onrender.com/scrape", {
             repo_url: repo_url
-        }, { timeout: 180000 }); 
+        }); 
         return response.data;
     } catch (error) {
         if (error.code === 'ECONNREFUSED' || error.response?.status === 503 || error.code === 'ETIMEDOUT') {
