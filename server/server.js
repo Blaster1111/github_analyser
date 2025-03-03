@@ -7,14 +7,16 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+const cors = require('cors');
+
 app.use(cors({
-    origin: ['https://gitlyser.netlify.app', 'http://localhost:5173'], 
+    origin: '*', // Allow all origins
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-  }));
+}));
 
 // Routes
-app.use('/api', analysisRoutes);
+app.use('/api', analysisRoutes);  
 
 app.use(notFound);
 app.use(errorHandler);
