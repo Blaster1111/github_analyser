@@ -10,7 +10,7 @@ app.use(express.json());
 const cors = require('cors');
 
 app.use(cors({
-    origin: '*', // Allow all origins
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
