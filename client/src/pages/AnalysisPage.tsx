@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+// import axios from 'axios';
 import { RepoAnalysis } from '../components/RepoAnalysis';
 import { FileAnalysis } from '../components/FileAnalysis';
 import { ReadmeGenerator } from '@/components/ReadmeGenerator';
@@ -8,13 +8,13 @@ import { ReadmeGenerator } from '@/components/ReadmeGenerator';
 export const AnalysisPage = () => {
     const [activeTab, setActiveTab] = useState('repo');
 
-    useEffect(() => {
-        axios.post("https://gitlyser-scraper.onrender.com/scrape", {
-            repo_url: "https://github.com/Blaster1111/ReactTsTemplate"
-        }).catch(error => {
-            console.warn("Failed to wake up scraper:", error.message);
-        });
-    }, []);
+    // useEffect(() => {
+    //     axios.post("https://gitlyser-scraper.onrender.com/scrape", {
+    //         repo_url: "https://github.com/Blaster1111/ReactTsTemplate"
+    //     }).catch(error => {
+    //         console.warn("Failed to wake up scraper:", error.message);
+    //     });
+    // }, []);
 
     return (
         <motion.div 
