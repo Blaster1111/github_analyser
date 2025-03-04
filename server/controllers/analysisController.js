@@ -21,7 +21,7 @@ export const analyzeFile = asyncHandler(async (req, res) => {
 export const analyzeRepo = asyncHandler(async(req,res)=> {
     const {repo_url} = req.body;
     
-    const {dir_structure, code_content} = scrapeRepository(repo_url);
+    const {dir_structure, code_content} = await scrapeRepository(repo_url);
     console.log(`here it is${dir_structure}`);
     const repoAnalysis = await analyzeRepoContent(dir_structure, code_content);
 
