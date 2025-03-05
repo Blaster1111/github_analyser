@@ -22,7 +22,6 @@ export const analyzeRepo = asyncHandler(async(req,res)=> {
     const {repo_url} = req.body;
     
     const {dir_structure, code_content} = await scrapeRepository(repo_url);
-    console.log(`here it is${dir_structure}`);
     const repoAnalysis = await analyzeRepoContent(dir_structure, code_content);
 
     res.status(200).json(new ApiResponse(200, repoAnalysis, `Analysis of ${repo_url}`));
