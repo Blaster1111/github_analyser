@@ -43,7 +43,7 @@ def scrape_gitingest(request: RepoRequest):
             logger.info("Page loaded")
 
             page_source = page.content()
-            logger.info(f"Full page data scraped: {page_source}")
+            # logger.info(f"Full page data scraped: {page_source}")
 
             # Simulate form submission
             logger.info("Filling and submitting form...")
@@ -56,11 +56,11 @@ def scrape_gitingest(request: RepoRequest):
 
             logger.info("Waiting for directory structure...")
             dir_structure = page.wait_for_selector("#directory-structure-container", timeout=30000).text_content()
-            logger.info(f"Directory structure found: {dir_structure}")
+            # logger.info(f"Directory structure found: {dir_structure}")
 
             logger.info("Waiting for code content...")
             code_content = page.wait_for_selector(".result-text", timeout=30000).text_content()
-            logger.info(f"Code content found: {code_content}")
+            # logger.info(f"Code content found: {code_content}")
 
             browser.close()
 
