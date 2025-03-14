@@ -15,7 +15,7 @@ Gitlyser is designed to help developers and repository owners understand their c
 
 **Technologies Used** 🛠️ 
 *   **Frontend**: Built using React, TypeScript, and Vite.
-*   **Backend**: Powered by FastAPI and Selenium.
+*   **Backend**: Powered by FastAPI and Playwright.
 *   **Database**: None (uses GitHub API for data retrieval).
 *   **APIs/Libraries**: Utilizes OpenRouter API for AI-powered analysis and GitHub API for repository data.
 
